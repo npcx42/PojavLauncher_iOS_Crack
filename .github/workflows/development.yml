@@ -23,7 +23,7 @@ jobs:
           - platform: 8
             platform_name: tvossimulator
     
-    runs-on: MacStadium
+    runs-on: macrunner
     steps:
       - name: Remove work folders
         env:
