@@ -3,6 +3,7 @@
 #import "../LauncherPreferences.h"
 #import "../ios_uikit_bridge.h"
 #import "../utils.h"
+#import "ElyByAuthenticator.h"
 
 @implementation BaseAuthenticator
 
@@ -31,7 +32,9 @@ static BaseAuthenticator *current = nil;
 
     if ([authData[@"expiresAt"] longValue] == 0) {
         return [[LocalAuthenticator alloc] initWithData:authData];
-    } else { 
+    } else if ([authData[@"authType"] isEqualToString:@"ely.by"]) {
+        return [[ElyByAuthenticator alloc] initWithData:authData];
+    } else {
         return [[MicrosoftAuthenticator alloc] initWithData:authData];
     }
 }
