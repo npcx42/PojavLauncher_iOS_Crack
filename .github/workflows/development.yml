@@ -44,8 +44,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          brew install cmake
-          brew install wget
+          brew install cmake make openjdk@8
 
       - name: Get gl4es latest commit hash
         id: gl4es-sha
