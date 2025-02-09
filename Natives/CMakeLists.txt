@@ -109,7 +109,7 @@ add_executable(PojavLauncher
   authenticator/BaseAuthenticator.m
   authenticator/LocalAuthenticator.m
   authenticator/MicrosoftAuthenticator.m
-  authenticator/ElyByAuthenticator.m  # Corrected path
+  authenticator/ElyByAuthenticator.m
 
   ctxbridges/gl_bridge.m
   ctxbridges/osm_bridge.m
@@ -141,7 +141,6 @@ add_executable(PojavLauncher
   input/KeyboardInput.m
 
   AccountListViewController.m
-  AccountSelectionViewController.m  # Add this line
   AppDelegate.m
   CustomControlsViewController.m
   CustomControlsViewController+UndoManager.m
