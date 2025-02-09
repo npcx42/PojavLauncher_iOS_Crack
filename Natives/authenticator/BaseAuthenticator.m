@@ -39,8 +39,17 @@ static BaseAuthenticator *current = nil;
     }
 }
 
++ (NSDictionary *)tokenDataOfProfile:(NSString *)profile {
+    // Implementation of tokenDataOfProfile
+    return nil;
+}
+
 - (id)initWithData:(NSMutableDictionary *)data {
-    current = self = [self init];
+    self = [super init];
+    if (self) {
+        // Initialize with data
+    }
+    current = self;
     self.authData = data;
     return self;
 }
