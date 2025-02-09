@@ -152,6 +152,10 @@
         [self actionLoginLocal:sender];
     }];
     [picker addAction:actionLocal];
+    UIAlertAction *actionElyBy = [UIAlertAction actionWithTitle:@"Ely.by Account" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self actionLoginElyBy:sender];
+    }];
+    [picker addAction:actionElyBy];
     UIAlertAction *cancel = [UIAlertAction actionWithTitle:localize(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil];
     [picker addAction:cancel];
 
@@ -239,6 +243,41 @@
     if ([self.authVC start] == NO) {
         showDialog(localize(@"Error", nil), @"Unable to open Safari");
     }
+}
+
+- (void)actionLoginElyBy:(UITableViewCell *)sender {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Sign in" message:@"Ely.by Account" preferredStyle:UIAlertControllerStyleAlert];
+    [controller addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"Username";
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+    }];
+    [controller addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"Password";
+        textField.secureTextEntry = YES;
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+    }];
+    [controller addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        NSArray *textFields = controller.textFields;
+        UITextField *usernameField = textFields[0];
+        UITextField *passwordField = textFields[1];
+        if (usernameField.text.length < 3 || usernameField.text.length > 16) {
+            controller.message = @"Username must be between 3 and 16 characters.";
+            [self presentViewController:controller animated:YES completion:nil];
+        } else {
+            id callback = ^(id status, BOOL success) {
+                self.whenItemSelected();
+                [self dismissViewControllerAnimated:YES completion:nil];
+            };
+            NSMutableDictionary *data = [NSMutableDictionary dictionary];
+            data[@"username"] = usernameField.text;
+            data[@"password"] = passwordField.text;
+            [[[ElyByAuthenticator alloc] initWithData:data] loginWithCallback:callback];
+        }
+    }]];
+    [controller addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 - (void)addActivityIndicatorTo:(UITableViewCell *)cell {
