@@ -7,6 +7,10 @@
 #import "UIImageView+AFNetworking.h"
 #import "ios_uikit_bridge.h"
 #import "utils.h"
+#import "AccountSelectionViewController.h"
+#import "LocalAuthenticator.h"
+#import "MicrosoftAuthenticator.h"
+#import "ElyByAuthenticator.h"
 
 @interface AccountListViewController()<ASWebAuthenticationPresentationContextProviding>
 
@@ -280,6 +284,45 @@
 #pragma mark - ASWebAuthenticationPresentationContextProviding
 - (ASPresentationAnchor)presentationAnchorForWebAuthenticationSession:(ASWebAuthenticationSession *)session {
     return UIApplication.sharedApplication.windows.firstObject;
+}
+
+@end
+
+@implementation AccountSelectionViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view.
+    
+    UIButton *localAccountButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [localAccountButton setTitle:@"Local Account" forState:UIControlStateNormal];
+    [localAccountButton addTarget:self action:@selector(addLocalAccount) forControlEvents:UIControlEventTouchUpInside];
+    localAccountButton.frame = CGRectMake(50, 100, 200, 50);
+    [self.view addSubview:localAccountButton];
+    
+    UIButton *microsoftAccountButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [microsoftAccountButton setTitle:@"Microsoft Account" forState:UIControlStateNormal];
+    [microsoftAccountButton addTarget:self action:@selector(addMicrosoftAccount) forControlEvents:UIControlEventTouchUpInside];
+    microsoftAccountButton.frame = CGRectMake(50, 200, 200, 50);
+    [self.view addSubview:microsoftAccountButton];
+    
+    UIButton *elyByAccountButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [elyByAccountButton setTitle:@"Ely.by Account" forState:UIControlStateNormal];
+    [elyByAccountButton addTarget:self action:@selector(addElyByAccount) forControlEvents:UIControlEventTouchUpInside];
+    elyByAccountButton.frame = CGRectMake(50, 300, 200, 50);
+    [self.view addSubview:elyByAccountButton];
+}
+
+- (void)addLocalAccount {
+    // Handle adding local account
+}
+
+- (void)addMicrosoftAccount {
+    // Handle adding Microsoft account
+}
+
+- (void)addElyByAccount {
+    // Handle adding Ely.by account
 }
 
 @end
