@@ -141,6 +141,7 @@ add_executable(PojavLauncher
   input/KeyboardInput.m
 
   AccountListViewController.m
+  AccountSelectionViewController.m  # Add this line
   AppDelegate.m
   CustomControlsViewController.m
   CustomControlsViewController+UndoManager.m
