@@ -109,6 +109,7 @@ add_executable(PojavLauncher
   authenticator/BaseAuthenticator.m
   authenticator/LocalAuthenticator.m
   authenticator/MicrosoftAuthenticator.m
+  Natives/authenticator/ElyByAuthenticator.m
 
   ctxbridges/gl_bridge.m
   ctxbridges/osm_bridge.m
