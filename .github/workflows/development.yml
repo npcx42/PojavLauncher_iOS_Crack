@@ -45,6 +45,7 @@ jobs:
       - name: Install dependencies
         run: |
           brew install cmake make
+          brew install --cask zulu8
 
       - name: Get gl4es latest commit hash
         id: gl4es-sha
