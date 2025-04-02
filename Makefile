@@ -130,9 +130,10 @@ METHOD_DIRCHECK   = \
 METHOD_CHANGE_PLAT = \
 	if [ '$(1)' != '11' ] && [ '$(1)' != '12' ]; then \
 		vtool -arch arm64 -set-build-version $(1) 14.0 16.0 -replace -output $(2) $(2); \
+		ldid -S -M $(2); \
 	else \
 		vtool -arch arm64 -set-build-version $(1) 1.0 1.0 -replace -output $(2) $(2); \
-	fi
+	fi \
 	
 # Function to package the application
 METHOD_PACKAGE = \
@@ -327,6 +328,8 @@ payload: native java jre assets
 	ldid -S $(OUTPUTDIR)/Payload/PojavLauncher.app; \
 	if [ '$(TROLLSTORE_JIT_ENT)' == '1' ]; then \
 		ldid -S$(SOURCEDIR)/entitlements.trollstore.xml $(OUTPUTDIR)/Payload/PojavLauncher.app/PojavLauncher; \
+	elif [ '$(PLATFORM)' == '6' ]; then \
+		ldid -S$(SOURCEDIR)/entitlements.codesign.xml $(OUTPUTDIR)/Payload/PojavLauncher.app/PojavLauncher; \
 	else \
 		ldid -S$(SOURCEDIR)/entitlements.sideload.xml $(OUTPUTDIR)/Payload/PojavLauncher.app/PojavLauncher; \
 	fi

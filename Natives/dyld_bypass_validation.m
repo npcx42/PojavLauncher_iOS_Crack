@@ -105,6 +105,12 @@ void *getDyldBase(void) {
 }
 
 void* hooked_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset) {
+    // this is to avoid a legacy codepath checking if process is allowed to map RWX which never worked properly
+    if (flags & MAP_JIT) {
+        errno = EINVAL;
+        return MAP_FAILED;
+    }
+
     void *map = __mmap(addr, len, prot, flags, fd, offset);
     if (map == MAP_FAILED && fd && (prot & PROT_EXEC)) {
         map = __mmap(addr, len, PROT_READ | PROT_WRITE, flags | MAP_PRIVATE | MAP_ANON, 0, 0);

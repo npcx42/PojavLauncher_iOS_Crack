@@ -19,6 +19,9 @@
 #define AliasDecl(NAME, EXT) \
     asm(".global _"# NAME "\n_" #NAME ": b _" #NAME #EXT);
 
+#define AliasDeclPriv(NAME) \
+    asm(".global _gl"# NAME "\n_gl" #NAME ": b _GL_" #NAME);
+
 // Core OpenGL 2.0
 AliasDecl(glGetTexImage, ANGLE)
 AliasDecl(glMapBuffer, OES)
@@ -36,6 +39,10 @@ AliasDecl(glPushDebugGroup, KHR)
 // GL_EXT_blend_func_extended
 AliasDecl(glBindFragDataLocation, EXT)
 AliasDecl(glBindFragDataLocationIndexed, EXT)
+
+// Hidden functions
+AliasDeclPriv(DrawBuffer)
+AliasDeclPriv(PolygonMode)
 
 int proxy_width, proxy_height, proxy_intformat, maxTextureSize;
 
