@@ -98,8 +98,9 @@ NSString* localize(NSString* key, NSString* comment) {
     // 1. Попытка получить строку из основного бандла для текущего языка
     NSString *value = NSLocalizedString(key, comment);
 
-    // 2. Если строка не найдена (возвращен ключ) и язык не английский, попробовать английский
-    if (![NSLocale.preferredLanguages[0] isEqualToString:@"en"] && [value isEqualToString:key]) {
+    // 2. Если строка не найдена (возвращен ключ), всегда пробовать английский,
+    // независимо от текущего языка пользователя
+    if ([value isEqualToString:key]) {
         NSString* path = [NSBundle.mainBundle pathForResource:@"en" ofType:@"lproj"];
         if (path) { // Убедиться, что путь существует
             NSBundle* englishBundle = [NSBundle bundleWithPath:path];
