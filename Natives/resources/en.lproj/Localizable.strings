@@ -87,6 +87,7 @@
 "login.alert.field.password" = "Password";
 "login.error.fields.empty" = "Username or password is empty";
 "login.error.invalid_response" = "Invalid server response";
+"login.error.invalid_credentials" = "Invalid username or password";
 
 "login.jit.checking" = "Checking for JIT";
 "login.jit.enabled" = "JIT has been enabled";

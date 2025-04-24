@@ -187,7 +187,12 @@ static NSError* createError(NSString *message, NSInteger code) {
         
         if (errorData) {
             @try {
+                // Логируем содержимое errorData для диагностики
+                NSString *rawErrorStr = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+                NSLog(@"[ElyByAuthenticator] Raw error data: %@", rawErrorStr);
+                
                 NSDictionary *errorDict = [NSJSONSerialization JSONObjectWithData:errorData options:kNilOptions error:nil];
+                NSLog(@"[ElyByAuthenticator] Error dictionary: %@", errorDict);
                 
                 // Проверка на двухфакторную аутентификацию (код 401 + определенное сообщение об ошибке)
                 if (response.statusCode == 401 && 
@@ -241,12 +246,20 @@ static NSError* createError(NSString *message, NSInteger code) {
                         callback(viewError, NO);
                     }
                     return;
+                } else if (response.statusCode == 401 && [errorDict[@"error"] isEqualToString:@"ForbiddenOperationException"]) {
+                    // Проверяем конкретную ошибку для неправильных учетных данных
+                    if ([errorDict[@"errorMessage"] isEqualToString:@"Invalid credentials. Invalid username or password."]) {
+                        NSError *invalidCredentialsError = createError(localize(@"login.error.invalid_credentials", @"Invalid username or password"), 1020);
+                        callback(invalidCredentialsError, NO);
+                        return;
+                    }
                 }
                 
                 NSString *errorMessage = errorDict[@"errorMessage"] ?: error.localizedDescription;
                 NSError *customError = createError(errorMessage, 1009);
                 callback(customError, NO);
             } @catch (NSException *exception) {
+                NSLog(@"[ElyByAuthenticator] Exception while processing error: %@", exception);
                 NSError *exceptionError = createError(error.localizedDescription, 1010);
                 callback(exceptionError, NO);
             }

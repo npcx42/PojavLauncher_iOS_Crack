@@ -72,8 +72,12 @@
 "login.error.username.outOfRange" = "Имя пользователя не должно быть короче 3 и длиннее 16 символов";
 
 "login.alert.field.username" = "Имя пользователя";
+"login.alert.field.password" = "Пароль";
+"login.error.fields.empty" = "Имя пользователя или пароль пустые";
+"login.error.invalid_response" = "Неверный ответ сервера";
+"login.error.invalid_credentials" = "Неверное имя пользователя или пароль";
 
-"login.jit.checking" = "Проверка JIT...";
+"login.jit.checking" = "Проверка JIT";
 "login.jit.enabled" = "JIT активирован";
 "login.jit.fail" = "Не удалось включить JIT.";
 "login.jit.fail.title" = "Не удалось включить JIT на вашем устройстве.";
@@ -247,8 +251,6 @@
 "controller_configurator.section.controller_style" = "Тип контроллера";
 
 "login.option.elyby" = "Учётная запись Ely.by";
-"login.alert.field.password" = "Пароль";
-"login.error.fields.empty" = "Имя пользователя или пароль не указаны";
 "login.ely.progress.auth" = "Авторизация на Ely.by...";
 "login.ely.progress.refresh" = "Обновление токена Ely.by...";
 "login.error.token_missing" = "Отсутствует токен доступа или клиентский токен";
@@ -260,5 +262,3 @@
 "login.cancelled" = "Вход отменен";
 "OK" = "ОК";
 "Cancel" = "Отмена";
-
-"login.error.invalid_response" = "Неверный ответ сервера";
