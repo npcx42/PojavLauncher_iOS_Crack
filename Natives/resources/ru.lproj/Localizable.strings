@@ -251,3 +251,14 @@
 "login.error.fields.empty" = "Имя пользователя или пароль не указаны";
 "login.ely.progress.auth" = "Авторизация на Ely.by...";
 "login.ely.progress.refresh" = "Обновление токена Ely.by...";
+"login.error.token_missing" = "Отсутствует токен доступа или клиентский токен";
+"login.error.token_expired" = "Срок действия токена аутентификации истек, пожалуйста, войдите снова";
+"login.ely.2fa.title" = "Двухфакторная аутентификация";
+"login.ely.2fa.message" = "Пожалуйста, введите код двухфакторной аутентификации";
+"login.ely.2fa.code" = "Код аутентификации";
+"login.ely.2fa.empty" = "Код аутентификации не может быть пустым";
+"login.cancelled" = "Вход отменен";
+"OK" = "ОК";
+"Cancel" = "Отмена";
+
+"login.error.invalid_response" = "Неверный ответ сервера";

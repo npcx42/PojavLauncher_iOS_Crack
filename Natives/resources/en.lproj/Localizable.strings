@@ -86,6 +86,7 @@
 "login.alert.field.username" = "Username";
 "login.alert.field.password" = "Password";
 "login.error.fields.empty" = "Username or password is empty";
+"login.error.invalid_response" = "Invalid server response";
 
 "login.jit.checking" = "Checking for JIT";
 "login.jit.enabled" = "JIT has been enabled";
@@ -127,6 +128,18 @@
 "login.msa.progress.acquireXboxProfile" = "(3/5) Acquiring the Xbox profile";
 "login.msa.progress.acquireMCToken" = "(4/5) Acquiring the Minecraft token";
 "login.msa.progress.checkMCProfile" = "(5/5) Checking the Minecraft profile";
+
+"login.ely.progress.auth" = "Authenticating with Ely.by...";
+"login.ely.progress.refresh" = "Refreshing Ely.by token...";
+"login.error.token_missing" = "Access token or client token is missing";
+"login.error.token_expired" = "Authentication token has expired, please log in again";
+"login.ely.2fa.title" = "Two-Factor Authentication";
+"login.ely.2fa.message" = "Please enter your two-factor authentication code";
+"login.ely.2fa.code" = "Authentication code";
+"login.ely.2fa.empty" = "Authentication code cannot be empty";
+"login.cancelled" = "Login cancelled";
+"OK" = "OK";
+"Cancel" = "Cancel";
 
 "News" = "News";
 "Profiles" = "Profiles";
@@ -327,6 +340,3 @@
 "controller_configurator.section.footer.menu_mappings" = "Bindings when the mouse is not locked, such as on the title screen or in the pause menu.";
 "controller_configurator.section.controller_style" = "Controller type";
 "controller_configurator.section.footer.controller_style" = "Show different controller button names in this configurator.";
-
-"login.ely.progress.auth" = "Authenticating with Ely.by...";
-"login.ely.progress.refresh" = "Refreshing Ely.by token...";
