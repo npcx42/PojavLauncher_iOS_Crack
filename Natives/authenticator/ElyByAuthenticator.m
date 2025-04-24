@@ -4,7 +4,7 @@
 #import "../utils.h"
 
 // URL для скачивания authlib-injector
-#define AUTHLIB_INJECTOR_URL @"https://github.com/yushijinhun/authlib-injector/releases/download/v1.2.5/authlib-injector-1.2.5.jar"
+#define AUTHLIB_INJECTOR_URL @"https://github.com/yushijinhun/authlib-injector/releases/download/v1.2.3/authlib-injector-1.2.3.jar"
 #define AUTHLIB_INJECTOR_FILE @"authlib-injector.jar"
 #define ELYBY_API_ROOT @"https://authserver.ely.by"
 
