@@ -20,6 +20,11 @@ static BaseAuthenticator *current = nil;
     current = auth;
 }
 
++ (NSDictionary *)tokenDataOfProfile:(NSString *)profile {
+    // Возвращает данные токена для профиля (заглушка)
+    return [NSDictionary dictionary];
+}
+
 + (id)loadSavedName:(NSString *)name {
     NSMutableDictionary *authData = parseJSONFromFile([NSString stringWithFormat:@"%s/accounts/%@.json", getenv("POJAV_HOME"), name]);
     if (authData[@"NSErrorObject"] != nil) {

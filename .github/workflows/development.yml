@@ -18,10 +18,6 @@ jobs:
         include:
           - platform: 2
             platform_name: ios
-          - platform: 7
-            platform_name: iossimulator
-          - platform: 8
-            platform_name: tvossimulator
     
     runs-on: macos-latest
     steps:
