@@ -1,6 +1,7 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 
 #import "authenticator/BaseAuthenticator.h"
+#import "authenticator/ElyByAuthenticator.h"
 #import "AccountListViewController.h"
 #import "AFNetworking.h"
 #import "LauncherPreferences.h"
@@ -144,6 +145,10 @@
         [self actionLoginMicrosoft:sender];
     }];
     [picker addAction:actionMicrosoft];
+    UIAlertAction *actionElyBy = [UIAlertAction actionWithTitle:localize(@"login.option.elyby", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self actionLoginElyBy:sender];
+    }];
+    [picker addAction:actionElyBy];
     UIAlertAction *actionLocal = [UIAlertAction actionWithTitle:localize(@"login.option.local", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self actionLoginLocal:sender];
     }];
@@ -187,6 +192,47 @@
             };
             [[[LocalAuthenticator alloc] initWithInput:usernameField.text] loginWithCallback:callback];
         }
+    }]];
+    [controller addAction:[UIAlertAction actionWithTitle:localize(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
+- (void)actionLoginElyBy:(UIView *)sender {
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:localize(@"Sign in", nil) message:localize(@"login.option.elyby", nil) preferredStyle:UIAlertControllerStyleAlert];
+    [controller addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = localize(@"login.alert.field.username", nil);
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+    }];
+    [controller addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = localize(@"login.alert.field.password", nil);
+        textField.clearButtonMode = UITextFieldViewModeWhileEditing;
+        textField.borderStyle = UITextBorderStyleRoundedRect;
+        textField.secureTextEntry = YES;
+    }];
+    [controller addAction:[UIAlertAction actionWithTitle:localize(@"OK", nil) style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        NSArray *textFields = controller.textFields;
+        UITextField *usernameField = textFields[0];
+        UITextField *passwordField = textFields[1];
+        
+        if (usernameField.text.length == 0 || passwordField.text.length == 0) {
+            controller.message = localize(@"login.error.fields.empty", nil);
+            [self presentViewController:controller animated:YES completion:nil];
+            return;
+        }
+        
+        self.modalInPresentation = YES;
+        self.tableView.userInteractionEnabled = NO;
+        [self addActivityIndicatorTo:sender];
+        
+        ElyByAuthenticator *auth = [[ElyByAuthenticator alloc] initWithInput:usernameField.text];
+        auth.authData[@"password"] = passwordField.text;
+        
+        id callback = ^(id status, BOOL success) {
+            [self callbackMicrosoftAuth:status success:success forCell:sender];
+        };
+        
+        [auth loginWithCallback:callback];
     }]];
     [controller addAction:[UIAlertAction actionWithTitle:localize(@"Cancel", nil) style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:controller animated:YES completion:nil];

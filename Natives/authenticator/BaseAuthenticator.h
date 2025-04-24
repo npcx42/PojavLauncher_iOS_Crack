@@ -26,3 +26,6 @@ typedef void(^Callback)(id status, BOOL success);
 + (void)clearTokenDataOfProfile:(NSString *)profile;
 
 @end
+
+@interface ElyByAuthenticator : BaseAuthenticator
+@end
