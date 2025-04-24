@@ -15,6 +15,8 @@
 #import "JavaLauncher.h"
 #import "LauncherPreferences.h"
 #import "PLProfiles.h"
+#import "authenticator/BaseAuthenticator.h"
+#import "authenticator/ElyByAuthenticator.h"
 
 #define fm NSFileManager.defaultManager
 
@@ -187,6 +189,23 @@ int launchJVM(NSString *username, id launchTarget, int width, int height, int mi
     margv[++margc] = "-Dorg.lwjgl.system.allocator=system";
     //margv[++margc] = "-Dorg.lwjgl.util.NoChecks=true";
     margv[++margc] = "-Dlog4j2.formatMsgNoLookups=true";
+
+    // Добавляем аргументы authlib-injector если используется аккаунт ely.by
+    if ([username length] > 0 && [BaseAuthenticator.current isKindOfClass:ElyByAuthenticator.class]) {
+        NSDictionary *authData = BaseAuthenticator.current.authData;
+        if (authData[@"authserver"] != nil) {
+            NSLog(@"[JavaLauncher] Adding authlib-injector arguments for ely.by");
+            NSArray *authlibArgs = [(ElyByAuthenticator *)BaseAuthenticator.current getJvmArgsForAuthlib];
+            if (authlibArgs.count > 0) {
+                for (NSString *arg in authlibArgs) {
+                    margv[++margc] = arg.UTF8String;
+                    NSLog(@"[JavaLauncher] Added authlib-injector arg: %s", arg.UTF8String);
+                }
+            } else {
+                NSLog(@"[JavaLauncher] Warning: No authlib-injector arguments available");
+            }
+        }
+    }
 
     // Preset OpenGL libname
     const char *glLibName = getenv("POJAV_RENDERER");
