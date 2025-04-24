@@ -167,7 +167,7 @@ static NSError* createError(NSString *message, NSInteger code) {
             }
             
             // Установка URL аватара
-            self.authData[@"profilePicURL"] = [NSString stringWithFormat:@"https://mc-heads.net/head/%@/120", self.authData[@"profileId"]];
+            self.authData[@"profilePicURL"] = [NSString stringWithFormat:@"https://skin.ely.by/helm/%@/120", self.authData[@"profileId"]];
             
             // Время истечения токена (24 часа)
             self.authData[@"expiresAt"] = @((long)[NSDate.date timeIntervalSince1970] + 86400);

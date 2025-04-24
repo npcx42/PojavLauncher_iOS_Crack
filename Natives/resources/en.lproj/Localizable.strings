@@ -1,4 +1,4 @@
-/*
+﻿/*
   Localizable.strings
   StringLocalization
 */
@@ -68,7 +68,7 @@
 
 "init.migrateDir" = "The PojavLauncher data directory is now %@. All of your existing data has been moved to the new location.";
 
-"java.error.missing_main_class" = "%@ is missing main class attribute. If this is a mod, put it into the “mods” folder of your selected instance.";
+"java.error.missing_main_class" = "%@ is missing main class attribute. If this is a mod, put it into the "mods" folder of your selected instance.";
 "java.error.missing_runtime" = "%@ requires Java %d or later to run. Please install it first and specify it in Manage Runtimes.";
 
 "launcher.mcl.downloading_file" = "Downloading %@";
@@ -84,6 +84,10 @@
 "login.error.username.outOfRange" = "Username must be at least 3 characters and a maximum of 16 characters";
 
 "login.alert.field.username" = "Username";
+"login.alert.field.password" = "Password";
+"login.error.fields.empty" = "Username or password is empty";
+"login.error.invalid_response" = "Invalid server response";
+"login.error.invalid_credentials" = "Invalid username or password";
 
 "login.jit.checking" = "Checking for JIT";
 "login.jit.enabled" = "JIT has been enabled";
@@ -98,6 +102,7 @@
 "login.option.select" = "Select account";
 "login.option.demo" = "Demo account";
 "login.option.microsoft" = "Microsoft account";
+"login.option.elyby" = "Ely.by account";
 "login.option.local" = "Local account";
 
 "login.warn.title.legacy_device" = "The next release of PojavLauncher will not be compatible with this device.";
@@ -233,7 +238,7 @@
 "preference.manage_runtime.header.default" = "Preferred Java version";
 "preference.manage_runtime.default.1165" = "1.16.5 and older";
 "preference.manage_runtime.default.117" = "1.17 and newer";
-"preference.manage_runtime.footer.default" = "Minecraft 1.16.5 and older may run with a newer Java version, however compatibility with mods is not guaranteed. External runtimes can be placed in the “java_runtimes” folder. Changing Java version for “Execute .jar” only takes effect if the installer does not expect a newer Java version.";
+"preference.manage_runtime.footer.default" = "Minecraft 1.16.5 and older may run with a newer Java version, however compatibility with mods is not guaranteed. External runtimes can be placed in the "java_runtimes" folder. Changing Java version for "Execute .jar" only takes effect if the installer does not expect a newer Java version.";
 "preference.manage_runtime.footer.java8" = "This is the default version for Minecraft 1.16.5 and older.";
 "preference.manage_runtime.footer.java17" = "This is the default version for Minecraft 1.17 and newer.";
 "preference.manage_runtime.header.invalid" = "Invalid runtimes";
@@ -253,7 +258,7 @@
 "preference.title.custom_env" = "Environment variables";
 "preference.detail.custom_env" = "This option is under construction. Create and edit custom_env.txt in the meantime.";
 
-"preference.title.debug_skip_wait_jit" = "Skip \"Waiting for JIT\" dialog";
+"preference.title.debug_skip_wait_jit" = "Skip "Waiting for JIT" dialog";
 "preference.detail.debug_skip_wait_jit" = "This does not allow you to launch without JIT, instead this skips debugger check, because check fails on certain jailbreaks.";
 "preference.title.debug_ipad_ui" = "Unlock iPadOS UI";
 "preference.detail.debug_ipad_ui" = "Unlock iPad-exclusive UI (alert, keyboard, etc.) if enabled or iPhone UI if disabled.";
@@ -324,3 +329,19 @@
 "controller_configurator.section.footer.menu_mappings" = "Bindings when the mouse is not locked, such as on the title screen or in the pause menu.";
 "controller_configurator.section.controller_style" = "Controller type";
 "controller_configurator.section.footer.controller_style" = "Show different controller button names in this configurator.";
+
+"login.ely.progress.auth" = "Authenticating with Ely.by...";
+"login.ely.progress.refresh" = "Refreshing Ely.by token...";
+"login.ely.error.auth" = "Failed to authenticate with Ely.by";
+"login.ely.error.refresh" = "Failed to refresh Ely.by token";
+"login.ely.error.authenticate" = "Authentication with Ely.by failed";
+"login.ely.error.session" = "Invalid Ely.by session";
+"login.ely.error.timeout" = "Ely.by connection timed out";
+"login.ely.2fa.title" = "Two-Factor Authentication";
+"login.ely.2fa.message" = "Please enter your two-factor authentication code";
+"login.ely.2fa.code" = "Authentication code";
+"login.ely.2fa.empty" = "Authentication code cannot be empty";
+"login.ely.2fa.incorrect" = "Incorrect authentication code";
+"login.cancelled" = "Login cancelled";
+"OK" = "OK";
+"Cancel" = "Cancel";
