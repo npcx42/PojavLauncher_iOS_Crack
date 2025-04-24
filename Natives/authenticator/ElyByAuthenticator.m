@@ -8,6 +8,13 @@
 #define AUTHLIB_INJECTOR_FILE @"authlib-injector.jar"
 #define ELYBY_API_ROOT @"https://authserver.ely.by"
 
+// Функция-помощник для создания NSError
+static NSError* createError(NSString *message, NSInteger code) {
+    return [NSError errorWithDomain:@"ElyByAuthenticator" 
+                            code:code 
+                        userInfo:@{NSLocalizedDescriptionKey: message}];
+}
+
 @implementation ElyByAuthenticator
 
 - (NSString *)getAuthlibInjectorPath {
@@ -95,7 +102,8 @@
     NSString *password = self.authData[@"password"];
     
     if (username.length == 0 || password.length == 0) {
-        callback(localize(@"login.error.fields.empty", nil), NO);
+        NSError *error = createError(localize(@"login.error.fields.empty", nil), 1002);
+        callback(error, NO);
         return;
     }
     
@@ -118,16 +126,22 @@
 - (void)sendAuthenticateRequest:(NSDictionary *)data manager:(AFHTTPSessionManager *)manager callback:(Callback)callback {
     NSString *authURL = [NSString stringWithFormat:@"%@/auth/authenticate", ELYBY_API_ROOT];
     
+    NSLog(@"[ElyByAuthenticator] Sending authentication request to %@", authURL);
+    
     [manager POST:authURL parameters:data headers:nil progress:nil success:^(NSURLSessionDataTask *task, NSDictionary *response) {
         @try {
+            NSLog(@"[ElyByAuthenticator] Authentication success response received");
+            
             // Обработка успешного ответа
             if (![response isKindOfClass:[NSDictionary class]]) {
-                callback(localize(@"login.error.invalid_response", @"Invalid server response"), NO);
+                NSError *error = createError(localize(@"login.error.invalid_response", @"Invalid server response"), 1003);
+                callback(error, NO);
                 return;
             }
             
             if (!response[@"accessToken"] || !response[@"clientToken"] || !response[@"selectedProfile"]) {
-                callback(localize(@"login.error.invalid_response", @"Invalid server response"), NO);
+                NSError *error = createError(localize(@"login.error.invalid_response", @"Invalid server response"), 1004);
+                callback(error, NO);
                 return;
             }
             
@@ -162,9 +176,12 @@
             callback(nil, [self saveChanges]);
         } @catch (NSException *exception) {
             NSLog(@"[ElyByAuthenticator] Exception in login success: %@", exception);
-            callback([NSString stringWithFormat:@"Error: %@", exception.reason], NO);
+            NSError *error = createError([NSString stringWithFormat:@"Error: %@", exception.reason], 1005);
+            callback(error, NO);
         }
     } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        NSLog(@"[ElyByAuthenticator] Authentication failed: %@", error);
+        
         NSData *errorData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
         NSHTTPURLResponse *response = error.userInfo[AFNetworkingOperationFailingURLResponseErrorKey];
         
@@ -180,8 +197,6 @@
                     NSLog(@"[ElyByAuthenticator] Two-factor authentication required");
                     
                     // Запрашиваем TOTP-код через UI
-                    // Примечание: здесь нужно добавить диалог для ввода кода
-                    // Это упрощенная реализация для демонстрации логики
                     UIAlertController *alert = [UIAlertController 
                         alertControllerWithTitle:localize(@"login.ely.2fa.title", @"Two-Factor Authentication")
                         message:localize(@"login.ely.2fa.message", @"Please enter your two-factor authentication code")
@@ -200,7 +215,8 @@
                             if (code.length > 0) {
                                 [self loginWithTwoFactorToken:code callback:callback];
                             } else {
-                                callback(localize(@"login.ely.2fa.empty", @"Authentication code cannot be empty"), NO);
+                                NSError *codeError = createError(localize(@"login.ely.2fa.empty", @"Authentication code cannot be empty"), 1006);
+                                callback(codeError, NO);
                             }
                         }];
                     
@@ -208,7 +224,8 @@
                         actionWithTitle:localize(@"Cancel", @"Cancel") 
                         style:UIAlertActionStyleCancel 
                         handler:^(UIAlertAction *action) {
-                            callback(localize(@"login.cancelled", @"Login cancelled"), NO);
+                            NSError *cancelError = createError(localize(@"login.cancelled", @"Login cancelled"), 1007);
+                            callback(cancelError, NO);
                         }];
                     
                     [alert addAction:okAction];
@@ -216,16 +233,26 @@
                     
                     // Получаем ViewController для отображения алерта
                     UIViewController *rootVC = [UIApplication sharedApplication].keyWindow.rootViewController;
-                    [rootVC presentViewController:alert animated:YES completion:nil];
+                    if (rootVC) {
+                        [rootVC presentViewController:alert animated:YES completion:nil];
+                    } else {
+                        NSLog(@"[ElyByAuthenticator] Error: Could not find root view controller to present 2FA alert");
+                        NSError *viewError = createError(@"Internal error: Could not present 2FA dialog", 1008);
+                        callback(viewError, NO);
+                    }
                     return;
                 }
                 
-                callback(errorDict[@"errorMessage"] ?: error.localizedDescription, NO);
+                NSString *errorMessage = errorDict[@"errorMessage"] ?: error.localizedDescription;
+                NSError *customError = createError(errorMessage, 1009);
+                callback(customError, NO);
             } @catch (NSException *exception) {
-                callback(error.localizedDescription, NO);
+                NSError *exceptionError = createError(error.localizedDescription, 1010);
+                callback(exceptionError, NO);
             }
         } else {
-            callback(error.localizedDescription, NO);
+            NSError *networkError = createError(error.localizedDescription, 1011);
+            callback(networkError, NO);
         }
     }];
 }
@@ -234,18 +261,19 @@
     // Сначала проверяем/скачиваем authlib-injector
     [self ensureAuthlibInjectorWithCompletion:^(BOOL success, NSError *error) {
         if (!success) {
-            callback(error.localizedDescription, NO);
+            callback(error, NO);
             return;
         }
         
         // Продолжаем процесс авторизации
-        callback(localize(@"login.ely.progress.auth", nil), YES);
+        callback(createError(localize(@"login.ely.progress.auth", nil), 0), YES);
         
         NSString *username = self.authData[@"input"];
         NSString *password = self.authData[@"password"];
         
         if (username.length == 0 || password.length == 0) {
-            callback(localize(@"login.error.fields.empty", nil), NO);
+            NSError *fieldsError = createError(localize(@"login.error.fields.empty", nil), 1002);
+            callback(fieldsError, NO);
             return;
         }
         
@@ -266,17 +294,18 @@
     // Сначала проверяем/скачиваем authlib-injector
     [self ensureAuthlibInjectorWithCompletion:^(BOOL success, NSError *error) {
         if (!success) {
-            callback(error.localizedDescription, NO);
+            callback(error, NO);
             return;
         }
         
-        callback(localize(@"login.ely.progress.refresh", nil), YES);
+        callback(createError(localize(@"login.ely.progress.refresh", nil), 0), YES);
         
         NSString *accessToken = self.authData[@"accessToken"];
         NSString *clientToken = self.authData[@"clientToken"];
         
         if (accessToken.length == 0 || clientToken.length == 0) {
-            callback(localize(@"login.error.token_missing", @"Access token or client token is missing"), NO);
+            NSError *tokenError = createError(localize(@"login.error.token_missing", @"Access token or client token is missing"), 1012);
+            callback(tokenError, NO);
             return;
         }
         
@@ -294,7 +323,8 @@
             @try {
                 // Обновляем токены
                 if (![response isKindOfClass:[NSDictionary class]] || !response[@"accessToken"] || !response[@"clientToken"]) {
-                    callback(localize(@"login.error.invalid_response", @"Invalid server response"), NO);
+                    NSError *invalidError = createError(localize(@"login.error.invalid_response", @"Invalid server response"), 1013);
+                    callback(invalidError, NO);
                     return;
                 }
                 
@@ -314,7 +344,8 @@
                 callback(nil, [self saveChanges]);
             } @catch (NSException *exception) {
                 NSLog(@"[ElyByAuthenticator] Exception in refresh success: %@", exception);
-                callback([NSString stringWithFormat:@"Error: %@", exception.reason], NO);
+                NSError *exceptionError = createError([NSString stringWithFormat:@"Error: %@", exception.reason], 1014);
+                callback(exceptionError, NO);
             }
         } failure:^(NSURLSessionDataTask *task, NSError *error) {
             NSData *errorData = error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
@@ -325,16 +356,21 @@
                     // Проверка на ошибку истекшего токена
                     if ([errorDict[@"error"] isEqualToString:@"ForbiddenOperationException"] && 
                         [errorDict[@"errorMessage"] isEqualToString:@"Token expired."]) {
-                        callback(localize(@"login.error.token_expired", @"Authentication token has expired, please log in again"), NO);
+                        NSError *expiredError = createError(localize(@"login.error.token_expired", @"Authentication token has expired, please log in again"), 1015);
+                        callback(expiredError, NO);
                         return;
                     }
                     
-                    callback(errorDict[@"errorMessage"] ?: error.localizedDescription, NO);
+                    NSString *errorMessage = errorDict[@"errorMessage"] ?: error.localizedDescription;
+                    NSError *customError = createError(errorMessage, 1016);
+                    callback(customError, NO);
                 } @catch (NSException *exception) {
-                    callback(error.localizedDescription, NO);
+                    NSError *exceptionError = createError(error.localizedDescription, 1017);
+                    callback(exceptionError, NO);
                 }
             } else {
-                callback(error.localizedDescription, NO);
+                NSError *networkError = createError(error.localizedDescription, 1018);
+                callback(networkError, NO);
             }
         }];
     }];

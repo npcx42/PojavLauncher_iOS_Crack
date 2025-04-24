@@ -95,16 +95,35 @@ NSError* saveJSONToFile(NSDictionary *dict, NSString *path) {
 }
 
 NSString* localize(NSString* key, NSString* comment) {
-    NSString *value = NSLocalizedString(key, nil);
+    // 1. Попытка получить строку из основного бандла для текущего языка
+    NSString *value = NSLocalizedString(key, comment);
+
+    // 2. Если строка не найдена (возвращен ключ) и язык не английский, попробовать английский
     if (![NSLocale.preferredLanguages[0] isEqualToString:@"en"] && [value isEqualToString:key]) {
         NSString* path = [NSBundle.mainBundle pathForResource:@"en" ofType:@"lproj"];
-        NSBundle* languageBundle = [NSBundle bundleWithPath:path];
-        value = [languageBundle localizedStringForKey:key value:nil table:nil];
-
-        if ([value isEqualToString:key]) {
-            value = [[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:key value:nil table:nil];
+        if (path) { // Убедиться, что путь существует
+            NSBundle* englishBundle = [NSBundle bundleWithPath:path];
+            if (englishBundle) {
+                NSString *englishValue = [englishBundle localizedStringForKey:key value:comment table:nil];
+                if (![englishValue isEqualToString:key]) { // Если найдено в английском
+                    value = englishValue;
+                }
+            }
         }
     }
+    
+    // 3. Если строка все еще не найдена (равна ключу), попробовать найти в UIKit
+    if ([value isEqualToString:key]) {
+        NSString *uikitValue = [[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:key value:comment table:nil];
+        if (uikitValue && ![uikitValue isEqualToString:key]) { // Если найдено в UIKit
+            value = uikitValue;
+        }
+    }
+    
+    // 4. Если после всех попыток строка все еще равна ключу, вернуть ключ (или пустую строку/дефолтное значение)
+    // Текущая логика возвращает ключ, что может быть причиной отображения ключей.
+    // Можно вернуть пустую строку или значение из comment, если это предпочтительнее.
+    // return [value isEqualToString:key] ? (comment ?: key) : value;
 
     return value;
 }

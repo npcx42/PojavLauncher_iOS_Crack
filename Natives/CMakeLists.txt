@@ -210,3 +210,16 @@ set_target_properties(PojavLauncher PROPERTIES
   MACOSX_BUNDLE TRUE
   MACOSX_FRAMEWORK_IDENTIFIER org.cmake.ExecutableTarget
   MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_LIST_DIR}/Info.plist")
+
+# Копирование файлов локализации в бандл
+add_custom_command(TARGET PojavLauncher POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E echo "Copying localization files to app bundle"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_LIST_DIR}/resources/en.lproj"
+    "$<TARGET_FILE_DIR:PojavLauncher>/../en.lproj"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_CURRENT_LIST_DIR}/resources/ru.lproj"
+    "$<TARGET_FILE_DIR:PojavLauncher>/../ru.lproj"
+  COMMENT "Copying localization files to app bundle"
+  VERBATIM
+)
