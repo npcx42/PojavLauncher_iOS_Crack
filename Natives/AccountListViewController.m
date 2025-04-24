@@ -223,13 +223,40 @@
         
         self.modalInPresentation = YES;
         self.tableView.userInteractionEnabled = NO;
-        [self addActivityIndicatorTo:sender];
+        
+        // Проверяем, является ли sender ячейкой таблицы
+        UITableViewCell *cell = nil;
+        if ([sender isKindOfClass:[UITableViewCell class]]) {
+            cell = (UITableViewCell *)sender;
+            [self addActivityIndicatorTo:cell];
+        }
         
         ElyByAuthenticator *auth = [[ElyByAuthenticator alloc] initWithInput:usernameField.text];
         auth.authData[@"password"] = passwordField.text;
         
         id callback = ^(id status, BOOL success) {
-            [self callbackMicrosoftAuth:status success:success forCell:sender];
+            if (cell) {
+                [self callbackMicrosoftAuth:status success:success forCell:cell];
+            } else {
+                // Обработка для случая, когда sender не ячейка таблицы
+                if (!success && status != nil) {
+                    self.modalInPresentation = NO;
+                    self.tableView.userInteractionEnabled = YES;
+                    
+                    if ([status isKindOfClass:[NSError class]]) {
+                        NSLog(@"[ElyBy] Error: %@", [status localizedDescription]);
+                        showDialog(localize(@"Error", nil), [status localizedDescription]);
+                    } else {
+                        showDialog(localize(@"Error", nil), status);
+                    }
+                } else if (success) {
+                    if ([status isKindOfClass:[NSString class]] && [status isEqualToString:@"DEMO"]) {
+                        showDialog(localize(@"login.warn.title.demomode", nil), localize(@"login.warn.message.demomode", nil));
+                    }
+                    self.whenItemSelected();
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                }
+            }
         };
         
         [auth loginWithCallback:callback];
@@ -260,10 +287,14 @@
             self.tableView.userInteractionEnabled = NO;
             [self addActivityIndicatorTo:sender];
             id callback = ^(id status, BOOL success) {
-                if ([status isKindOfClass:NSString.class] && [status isEqualToString:@"DEMO"] && success) {
-                    showDialog(localize(@"login.warn.title.demomode", nil), localize(@"login.warn.message.demomode", nil));
+                if ([status isKindOfClass:[NSError class]]) {
+                    sender.detailTextLabel.text = [status localizedDescription];
+                } else {
+                    if ([status isKindOfClass:[NSString class]] && [status isEqualToString:@"DEMO"]) {
+                        showDialog(localize(@"login.warn.title.demomode", nil), localize(@"login.warn.message.demomode", nil));
+                    }
+                    sender.detailTextLabel.text = status;
                 }
-                [self callbackMicrosoftAuth:status success:success forCell:sender];
             };
             [[[MicrosoftAuthenticator alloc] initWithInput:queryItems[@"code"]] loginWithCallback:callback];
         } else {
@@ -300,16 +331,28 @@
 - (void)callbackMicrosoftAuth:(id)status success:(BOOL)success forCell:(UITableViewCell *)cell {
     if (status != nil) {
         if (success) {
-            cell.detailTextLabel.text = status;
+            if ([status isKindOfClass:[NSError class]]) {
+                cell.detailTextLabel.text = [status localizedDescription];
+            } else {
+                if ([status isKindOfClass:[NSString class]] && [status isEqualToString:@"DEMO"]) {
+                    showDialog(localize(@"login.warn.title.demomode", nil), localize(@"login.warn.message.demomode", nil));
+                }
+                cell.detailTextLabel.text = status;
+            }
         } else {
             self.modalInPresentation = NO;
             self.tableView.userInteractionEnabled = YES;
             [self removeActivityIndicatorFrom:cell];
-            cell.detailTextLabel.text = [status localizedDescription];
-            NSData *errorData = ((NSError *)status).userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
-            NSString *errorStr = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
-            NSLog(@"[MSA] Error: %@", errorStr);
-            showDialog(localize(@"Error", nil), errorStr);
+            if ([status isKindOfClass:[NSError class]]) {
+                cell.detailTextLabel.text = [status localizedDescription];
+                NSData *errorData = ((NSError *)status).userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey];
+                NSString *errorStr = [[NSString alloc] initWithData:errorData encoding:NSUTF8StringEncoding];
+                NSLog(@"[MSA] Error: %@", errorStr);
+                showDialog(localize(@"Error", nil), errorStr);
+            } else {
+                cell.detailTextLabel.text = status;
+                showDialog(localize(@"Error", nil), status);
+            }
         }
     } else if (success) {
         self.whenItemSelected();
