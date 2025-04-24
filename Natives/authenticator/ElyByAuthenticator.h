@@ -2,4 +2,6 @@
 
 @interface ElyByAuthenticator : BaseAuthenticator
 
+- (NSArray *)getJvmArgsForAuthlib;
+
 @end 
