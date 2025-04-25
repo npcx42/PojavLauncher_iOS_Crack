@@ -48,7 +48,8 @@ extern dispatch_group_t fatalExitGroup;
     // Загружаем бандл с локализацией и устанавливаем его
     if (resourcePath) {
         NSBundle *localizationBundle = [NSBundle bundleWithPath:resourcePath];
-        [NSBundle setPreferredLocalizationsFromArray:[NSArray arrayWithObject:[localizationBundle preferredLocalizations].firstObject]];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithObject:[localizationBundle preferredLocalizations].firstObject] forKey:@"AppleLanguages"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
     
     return YES;
