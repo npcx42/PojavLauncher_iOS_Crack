@@ -31,28 +31,4 @@ extern dispatch_group_t fatalExitGroup;
     }
 }
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Проверяем корректность файлов локализации
-    validateAllLocalizations();
-    
-    // Инициализируем локализацию в начале запуска приложения
-    NSString *languageCode = [[NSLocale preferredLanguages] firstObject];
-    NSString *resourcePath = [NSBundle.mainBundle pathForResource:languageCode ofType:@"lproj"];
-    
-    // Если не найден язык пользователя, используем английский по умолчанию
-    if (!resourcePath || !validateLocalizationFile(languageCode)) {
-        // Если основной язык не прошел валидацию, пробуем английский
-        resourcePath = [NSBundle.mainBundle pathForResource:@"en" ofType:@"lproj"];
-    }
-    
-    // Загружаем бандл с локализацией и устанавливаем его
-    if (resourcePath) {
-        NSBundle *localizationBundle = [NSBundle bundleWithPath:resourcePath];
-        [[NSUserDefaults standardUserDefaults] setObject:[NSArray arrayWithObject:[localizationBundle preferredLocalizations].firstObject] forKey:@"AppleLanguages"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    
-    return YES;
-}
-
 @end

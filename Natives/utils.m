@@ -95,49 +95,36 @@ NSError* saveJSONToFile(NSDictionary *dict, NSString *path) {
 }
 
 NSString* localize(NSString* key, NSString* comment) {
-    if (key == nil) {
-        NSLog(@"[Localization] Warning: nil key passed to localize()");
-        return comment ?: @"";
-    }
-    
-    NSString *value = nil;
-    
-    @try {
-        // 1. Попытка получить строку из основного бандла для текущего языка
-        value = NSLocalizedString(key, comment);
+    // 1. Попытка получить строку из основного бандла для текущего языка
+    NSString *value = NSLocalizedString(key, comment);
 
-        // 2. Если строка не найдена (возвращен ключ), всегда пробовать английский,
-        // независимо от текущего языка пользователя
-        if ([value isEqualToString:key]) {
-            NSString* path = [NSBundle.mainBundle pathForResource:@"en" ofType:@"lproj"];
-            if (path) { // Убедиться, что путь существует
-                NSBundle* englishBundle = [NSBundle bundleWithPath:path];
-                if (englishBundle) {
-                    NSString *englishValue = [englishBundle localizedStringForKey:key value:comment table:nil];
-                    if (![englishValue isEqualToString:key]) { // Если найдено в английском
-                        value = englishValue;
-                    }
+    // 2. Если строка не найдена (возвращен ключ), всегда пробовать английский,
+    // независимо от текущего языка пользователя
+    if ([value isEqualToString:key]) {
+        NSString* path = [NSBundle.mainBundle pathForResource:@"en" ofType:@"lproj"];
+        if (path) { // Убедиться, что путь существует
+            NSBundle* englishBundle = [NSBundle bundleWithPath:path];
+            if (englishBundle) {
+                NSString *englishValue = [englishBundle localizedStringForKey:key value:comment table:nil];
+                if (![englishValue isEqualToString:key]) { // Если найдено в английском
+                    value = englishValue;
                 }
             }
         }
-        
-        // 3. Если строка все еще не найдена (равна ключу), попробовать найти в UIKit
-        if ([value isEqualToString:key]) {
-            NSString *uikitValue = [[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:key value:comment table:nil];
-            if (uikitValue && ![uikitValue isEqualToString:key]) { // Если найдено в UIKit
-                value = uikitValue;
-            }
+    }
+    
+    // 3. Если строка все еще не найдена (равна ключу), попробовать найти в UIKit
+    if ([value isEqualToString:key]) {
+        NSString *uikitValue = [[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:key value:comment table:nil];
+        if (uikitValue && ![uikitValue isEqualToString:key]) { // Если найдено в UIKit
+            value = uikitValue;
         }
-        
-        // 4. Если после всех попыток строка все еще равна ключу, вернуть значение comment если оно есть,
-        // иначе вернуть ключ как запасной вариант
-        if ([value isEqualToString:key] && comment != nil) {
-            return comment;
-        }
-    } @catch (NSException *exception) {
-        NSLog(@"[Localization] Error for key '%@': %@", key, exception.reason);
-        // В случае ошибки возвращаем комментарий или ключ
-        return comment ?: key;
+    }
+    
+    // 4. Если после всех попыток строка все еще равна ключу, вернуть значение comment если оно есть,
+    // иначе вернуть ключ как запасной вариант
+    if ([value isEqualToString:key] && comment != nil) {
+        return comment;
     }
 
     return value;
@@ -182,46 +169,4 @@ void setButtonPointerInteraction(UIButton *button) {
         UITargetedPreview *preview = [[UITargetedPreview alloc] initWithView:button];
         return [NSClassFromString(@"UIPointerStyle") styleWithEffect:[NSClassFromString(@"UIPointerHighlightEffect") effectWithPreview:preview] shape:proposedShape];
     };
-}
-
-BOOL validateLocalizationFile(NSString* languageCode) {
-    NSString* path = [NSBundle.mainBundle pathForResource:languageCode ofType:@"lproj"];
-    if (!path) {
-        NSLog(@"[Localization] Warning: Could not find .lproj directory for language %@", languageCode);
-        return NO;
-    }
-    
-    NSString* stringsPath = [path stringByAppendingPathComponent:@"Localizable.strings"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:stringsPath]) {
-        NSLog(@"[Localization] Warning: Localizable.strings not found for language %@", languageCode);
-        return NO;
-    }
-    
-    NSError* error = nil;
-    NSDictionary* stringsDictionary = [NSDictionary dictionaryWithContentsOfFile:stringsPath];
-    if (!stringsDictionary) {
-        NSString* fileContents = [NSString stringWithContentsOfFile:stringsPath encoding:NSUTF8StringEncoding error:&error];
-        NSLog(@"[Localization] Error: Invalid Localizable.strings for language %@: %@", languageCode, error.localizedDescription);
-        // Можно сохранить детали ошибки для диагностики
-        NSString* errorPath = [NSString stringWithFormat:@"%s/localization_error_%@.log", getenv("POJAV_HOME"), languageCode];
-        NSString* errorLog = [NSString stringWithFormat:@"Error: %@\n\nFile contents:\n%@", error.localizedDescription, fileContents];
-        [errorLog writeToFile:errorPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-        return NO;
-    }
-    
-    NSLog(@"[Localization] Validated %@ localization with %lu strings", languageCode, (unsigned long)stringsDictionary.count);
-    return YES;
-}
-
-void validateAllLocalizations(void) {
-    NSArray* languages = [NSBundle.mainBundle localizations];
-    NSMutableArray* validLanguages = [NSMutableArray array];
-    
-    for (NSString* language in languages) {
-        if (validateLocalizationFile(language)) {
-            [validLanguages addObject:language];
-        }
-    }
-    
-    NSLog(@"[Localization] Valid localizations: %@", validLanguages);
 }

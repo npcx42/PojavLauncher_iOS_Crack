@@ -69,8 +69,6 @@ UIViewController* currentVC();
 void openLink(UIViewController* sender, NSURL* link);
 
 NSString* localize(NSString* key, NSString* comment);
-BOOL validateLocalizationFile(NSString* languageCode);
-void validateAllLocalizations(void);
 NSMutableDictionary* parseJSONFromFile(NSString *path);
 NSError* saveJSONToFile(NSDictionary *dict, NSString *path);
 void customNSLog(const char *file, int lineNumber, const char *functionName, NSString *format, ...);
