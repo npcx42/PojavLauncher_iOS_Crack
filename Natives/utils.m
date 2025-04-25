@@ -198,12 +198,12 @@ BOOL validateLocalizationFile(NSString* languageCode) {
     }
     
     NSError* error = nil;
-    NSDictionary* stringsDictionary = [NSDictionary dictionaryWithContentsOfFile:stringsPath error:&error];
-    if (!stringsDictionary || error) {
+    NSDictionary* stringsDictionary = [NSDictionary dictionaryWithContentsOfFile:stringsPath];
+    if (!stringsDictionary) {
+        NSString* fileContents = [NSString stringWithContentsOfFile:stringsPath encoding:NSUTF8StringEncoding error:&error];
         NSLog(@"[Localization] Error: Invalid Localizable.strings for language %@: %@", languageCode, error.localizedDescription);
         // Можно сохранить детали ошибки для диагностики
         NSString* errorPath = [NSString stringWithFormat:@"%s/localization_error_%@.log", getenv("POJAV_HOME"), languageCode];
-        NSString* fileContents = [NSString stringWithContentsOfFile:stringsPath encoding:NSUTF8StringEncoding error:nil];
         NSString* errorLog = [NSString stringWithFormat:@"Error: %@\n\nFile contents:\n%@", error.localizedDescription, fileContents];
         [errorLog writeToFile:errorPath atomically:YES encoding:NSUTF8StringEncoding error:nil];
         return NO;
@@ -218,7 +218,7 @@ void validateAllLocalizations(void) {
     NSMutableArray* validLanguages = [NSMutableArray array];
     
     for (NSString* language in languages) {
-        if ([validateLocalizationFile(language) boolValue]) {
+        if (validateLocalizationFile(language)) {
             [validLanguages addObject:language];
         }
     }
