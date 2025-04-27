@@ -1,6 +1,7 @@
 #pragma once
 
 #import <UIKit/UIKit.h>
+#import "PLLocalization.h"
 
 #include <stdbool.h>
 #include "environ.h"
@@ -68,7 +69,9 @@ BOOL PLPatchMachOPlatformForFile(const char *path);
 UIViewController* currentVC();
 void openLink(UIViewController* sender, NSURL* link);
 
+__attribute__((deprecated("Use PLLocalizedString() macro or PLLocalization class methods instead")))
 NSString* localize(NSString* key, NSString* comment);
+
 NSMutableDictionary* parseJSONFromFile(NSString *path);
 NSError* saveJSONToFile(NSDictionary *dict, NSString *path);
 void customNSLog(const char *file, int lineNumber, const char *functionName, NSString *format, ...);

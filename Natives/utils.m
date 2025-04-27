@@ -95,39 +95,8 @@ NSError* saveJSONToFile(NSDictionary *dict, NSString *path) {
 }
 
 NSString* localize(NSString* key, NSString* comment) {
-    // 1. Попытка получить строку из основного бандла для текущего языка
-    NSString *value = NSLocalizedString(key, comment);
-
-    // 2. Если строка не найдена (возвращен ключ), всегда пробовать английский,
-    // независимо от текущего языка пользователя
-    if ([value isEqualToString:key]) {
-        NSString* path = [NSBundle.mainBundle pathForResource:@"en" ofType:@"lproj"];
-        if (path) { // Убедиться, что путь существует
-            NSBundle* englishBundle = [NSBundle bundleWithPath:path];
-            if (englishBundle) {
-                NSString *englishValue = [englishBundle localizedStringForKey:key value:comment table:nil];
-                if (![englishValue isEqualToString:key]) { // Если найдено в английском
-                    value = englishValue;
-                }
-            }
-        }
-    }
-    
-    // 3. Если строка все еще не найдена (равна ключу), попробовать найти в UIKit
-    if ([value isEqualToString:key]) {
-        NSString *uikitValue = [[NSBundle bundleWithIdentifier:@"com.apple.UIKit"] localizedStringForKey:key value:comment table:nil];
-        if (uikitValue && ![uikitValue isEqualToString:key]) { // Если найдено в UIKit
-            value = uikitValue;
-        }
-    }
-    
-    // 4. Если после всех попыток строка все еще равна ключу, вернуть значение comment если оно есть,
-    // иначе вернуть ключ как запасной вариант
-    if ([value isEqualToString:key] && comment != nil) {
-        return comment;
-    }
-
-    return value;
+    // Новая реализация, просто делегирует вызов в PLLocalization
+    return [PLLocalization localizeKey:key comment:comment];
 }
 
 void customNSLog(const char *file, int lineNumber, const char *functionName, NSString *format, ...)
